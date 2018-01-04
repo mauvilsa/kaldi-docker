@@ -1,6 +1,6 @@
-MIT License
+The MIT License (MIT)
 
-Copyright (c) 2018 Mauricio Villegas
+Copyright (c) 2018-present, Mauricio Villegas <mauricio_ville@yahoo.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

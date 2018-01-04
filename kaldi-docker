@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [ "$#" = 0 ]; then
+  echo "
+Command line interface to kaldi installed in a docker container. It assumes that
+docker is installed, that it can be executed without sudo and that the
+corresponding image is tagged as kaldi:active. It will only work if the
+arguments do not contain spaces or special characters according to bash and is
+executed from and referencing only files in the host's /Users, /home, /mnt,
+/media, /opt or /tmp directories.
+";
+  exit 0;
+fi
+
+OPTS=( -u $(id -u):$(id -g) );
+[ -d "/Users" ] && OPTS+=( -v /Users:/Users );
+[ -d "/home" ]  && OPTS+=( -v /home:/home );
+[ -d "/mnt" ]   && OPTS+=( -v /mnt:/mnt );
+[ -d "/media" ] && OPTS+=( -v /media:/media );
+[ -d "/opt" ]   && OPTS+=( -v /opt:/opt );
+[ -d "/tmp" ]   && OPTS+=( -v /tmp:/tmp );
+
+docker run --rm -t "${OPTS[@]}" kaldi:active \
+  bash -c "cd $(pwd) && $*";
