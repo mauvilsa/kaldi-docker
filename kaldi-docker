@@ -1,13 +1,28 @@
 #!/bin/bash
 
-if [ "$#" = 0 ]; then
+
+if ( [ "$#" = 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ] ); then
   echo "
-Command line interface to kaldi installed in a docker container. It assumes that
-docker is installed, that it can be executed without sudo and that the
-corresponding image is tagged as kaldi:active. It will only work if the
-arguments do not contain spaces or special characters according to bash and is
-executed from and referencing only files in the host's /Users, /home, /mnt,
-/media, /opt or /tmp directories.
+DESCRIPTION
+  Command line interface to kaldi installed in a docker container. It assumes
+  that docker is installed, that it can be executed without sudo and that the
+  corresponding image is tagged as kaldi:active. It will only work if the
+  arguments do not contain spaces or special characters according to bash and is
+  executed from and referencing only files in the host's /Users, /home, /mnt,
+  /media, /opt or /tmp directories.
+
+  The interface can also be used to execute custom scripts inside the
+  container, e.g. to run a long pipe of different kaldi commands. For this to
+  work, the script must be located in a directory accessible to the container
+  (see above) and be in your \$PATH or be referenced with its full or relative
+  path.
+
+SYNOPSIS
+  kaldi-docker COMMAND ARGUMENTS
+
+  COMMAND is any of the Kaldi command line tools or a custom script as explained
+  above. To see the detailed help of a command, just provide --help as argument,
+  e.g. kaldi-docker fstcopy --help.
 ";
   exit 0;
 fi
@@ -21,4 +36,4 @@ OPTS=( -u $(id -u):$(id -g) );
 [ -d "/tmp" ]   && OPTS+=( -v /tmp:/tmp );
 
 docker run --rm -t "${OPTS[@]}" kaldi:active \
-  bash -c "cd $(pwd) && $*";
+  bash -c "cd $(pwd) && PATH=\".:$PATH:\$PATH\" TERM=xterm-256color $*";
