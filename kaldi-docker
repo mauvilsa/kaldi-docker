@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 if ( [ "$#" = 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ] ); then
   echo "
 DESCRIPTION
@@ -35,5 +34,5 @@ OPTS=( -u $(id -u):$(id -g) );
 [ -d "/opt" ]   && OPTS+=( -v /opt:/opt );
 [ -d "/tmp" ]   && OPTS+=( -v /tmp:/tmp );
 
-docker run --rm -t "${OPTS[@]}" kaldi:active \
+docker run --rm --interactive --log-driver none "${OPTS[@]}" kaldi:active \
   bash -c "cd $(pwd) && PATH=\".:$PATH:\$PATH\" TERM=xterm-256color $*";

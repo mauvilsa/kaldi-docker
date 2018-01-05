@@ -1,6 +1,6 @@
 # NAME
 
-kaldi-docker - Kaldi installed in a docker image and accessible through a command line interface.
+kaldi-docker - [Kaldi](https://github.com/kaldi-asr/kaldi) installed in a docker image and accessible through a command line interface.
 
 # INSTALLATION AND USAGE
 
