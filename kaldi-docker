@@ -5,10 +5,9 @@ if ( [ "$#" = 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ] ); then
 DESCRIPTION
   Command line interface to kaldi installed in a docker container. It assumes
   that docker is installed, that it can be executed without sudo and that the
-  corresponding image is tagged as kaldi:active. It will only work if the
-  arguments do not contain spaces or special characters according to bash and is
-  executed from and referencing only files in the host's /Users, /home, /mnt,
-  /media, /opt or /tmp directories.
+  corresponding image is tagged as kaldi:active. It will only work if executed
+  from and referencing only files in the host's /Users, /home, /mnt, /media,
+  /opt or /tmp directories.
 
   The interface can also be used to execute custom scripts inside the
   container, e.g. to run a long pipe of different kaldi commands. For this to
@@ -26,7 +25,12 @@ SYNOPSIS
   exit 0;
 fi
 
-OPTS=( -u $(id -u):$(id -g) );
+OPTS=( --user $(id -u):$(id -g) );
+OPTS+=( --rm );
+OPTS+=( --interactive );
+OPTS+=( --log-driver none );
+OPTS+=( --workdir "$(pwd)" );
+OPTS+=( --env TERM=xterm-256color );
 [ -d "/Users" ] && OPTS+=( -v /Users:/Users );
 [ -d "/home" ]  && OPTS+=( -v /home:/home );
 [ -d "/mnt" ]   && OPTS+=( -v /mnt:/mnt );
@@ -34,5 +38,8 @@ OPTS=( -u $(id -u):$(id -g) );
 [ -d "/opt" ]   && OPTS+=( -v /opt:/opt );
 [ -d "/tmp" ]   && OPTS+=( -v /tmp:/tmp );
 
-docker run --rm --interactive --log-driver none "${OPTS[@]}" kaldi:active \
-  bash -c "cd $(pwd) && PATH=\".:$PATH:\$PATH\" TERM=xterm-256color $*";
+CMD=("${@// /\\ }");
+CMD=("${CMD[@]//|/\\|}");
+
+docker run "${OPTS[@]}" kaldi:active \
+  bash -c "PATH=\".:$PATH:\$PATH\" ${CMD[*]}";
