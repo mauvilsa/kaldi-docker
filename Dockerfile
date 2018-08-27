@@ -42,6 +42,12 @@ RUN apt-get update --fix-missing \
  && for f in $(find . -type f -executable | grep -F bin/); do echo $f $(file $f); done | grep 'ELF 64-bit LSB executable' | sed 's| .*||' | xargs mv -t /usr/local/bin \
  && mv $(realpath lib/*) /usr/local/lib \
 
+### Kaldi development files ###
+ && cp -rp --parents */*.h /usr/local/include \
+ && mkdir -p /usr/local/src \
+ && cp -rp kaldi.mk makefiles /usr/local/src \
+ && sed -i 's|/tmp/kaldi/tools/openfst|/usr/local|' /usr/local/src/kaldi.mk \
+
 ### Remove build-only software ###
  && cd \
  && rm -rf /tmp/kaldi \
