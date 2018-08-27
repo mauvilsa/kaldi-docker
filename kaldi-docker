@@ -3,17 +3,17 @@
 if ( [ "$#" = 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ] ); then
   echo "
 DESCRIPTION
-  Command line interface to kaldi installed in a docker container. It assumes
+  Command line interface to Kaldi installed in a docker container. It assumes
   that docker is installed, that it can be executed without sudo and that the
   corresponding image is tagged as kaldi:active. It will only work if executed
-  from and referencing only files in the host's /Users, /home, /mnt, /media,
-  /opt or /tmp directories.
+  from and referencing only files in the host's /Users, /home, /mnt, /media or
+  /tmp directories.
 
   The interface can also be used to execute custom scripts inside the
-  container, e.g. to run a long pipe of different kaldi commands. For this to
-  work, the script must be located in a directory accessible to the container
-  (see above) and be in your \$PATH or be referenced with its full or relative
-  path.
+  container, e.g. to run a long pipe of different Kaldi commands. For this to
+  work, the custom script must be located in a directory accessible to the
+  container (see above) and be in your \$DPATH or be referenced with its full
+  or relative path.
 
 SYNOPSIS
   kaldi-docker COMMAND ARGUMENTS
@@ -25,21 +25,25 @@ SYNOPSIS
   exit 0;
 fi
 
+CMD=("$@");
+CMD=("${CMD[@]//$'\x27'/$'\x27\x22\x27\x22\x27'}");
+CMD=("${CMD[@]/#/$'\x27'}");
+CMD=("${CMD[@]/%/$'\x27'}");
+
 OPTS=( --user $(id -u):$(id -g) );
 OPTS+=( --rm );
+OPTS+=( --workdir "$(pwd)" );
 OPTS+=( --interactive );
 OPTS+=( --log-driver none );
-OPTS+=( --workdir "$(pwd)" );
 OPTS+=( --env TERM=xterm-256color );
 [ -d "/Users" ] && OPTS+=( -v /Users:/Users );
 [ -d "/home" ]  && OPTS+=( -v /home:/home );
 [ -d "/mnt" ]   && OPTS+=( -v /mnt:/mnt );
 [ -d "/media" ] && OPTS+=( -v /media:/media );
-[ -d "/opt" ]   && OPTS+=( -v /opt:/opt );
 [ -d "/tmp" ]   && OPTS+=( -v /tmp:/tmp );
 
-CMD=("${@// /\\ }");
-CMD=("${CMD[@]//|/\\|}");
+DPATH="";
+[ "$DPATH" != "" ] && DPATH="PATH=\"$DPATH:\$PATH\" ";
 
 docker run "${OPTS[@]}" kaldi:active \
-  bash -c "PATH=\".:$PATH:\$PATH\" ${CMD[*]}";
+  bash -c "$DPATH${CMD[*]}";

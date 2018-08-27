@@ -1,4 +1,6 @@
-FROM library/ubuntu:16.04
+ARG UBUNTU_TAG=16.04
+
+FROM library/ubuntu:$UBUNTU_TAG
 
 MAINTAINER Mauricio Villegas <mauricio_ville@yahoo.com>
 
@@ -20,6 +22,7 @@ RUN apt-get update --fix-missing \
       libatlas3-base \
       python \
       python3 \
+      sox \
 
 ### Compile and install kaldi from repo ###
  && git clone --depth 1 https://github.com/kaldi-asr/kaldi.git /tmp/kaldi \
@@ -43,7 +46,6 @@ RUN apt-get update --fix-missing \
  && cd \
  && rm -rf /tmp/kaldi \
  && apt-get purge -y \
-      ca-certificates \
       build-essential \
       git \
       subversion \
@@ -54,6 +56,7 @@ RUN apt-get update --fix-missing \
       libtool \
       python \
       python3 \
+      sox \
  && apt-get autoremove -y \
  && apt-get purge -y $(dpkg -l | awk '{if($1=="rc")print $2}') \
  && apt-get clean \
